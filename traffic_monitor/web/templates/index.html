@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowWave — Real-Time Intersection Intelligence</title>
+    <meta name="description" content="AI-powered real-time traffic monitoring dashboard with YOLOv8 vehicle detection, turning movement analysis, and adaptive signal control.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚦</text></svg>">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="app">
+
+    <!-- ═══ Header ═══ -->
+    <header class="header">
+        <div class="header__brand">
+            <div class="header__logo">🚦</div>
+            <div>
+                <h1 class="header__title">FlowWave</h1>
+                <p class="header__subtitle">Real-Time Intersection Intelligence · YOLOv8</p>
+            </div>
+        </div>
+        <div class="header__status">
+            <div class="status-badge status-badge--live">
+                <span class="status-dot"></span>
+                <span>LIVE</span>
+            </div>
+            <div class="status-badge">
+                <span class="status-badge__time" id="clock">--:--:--</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══ Dashboard Grid ═══ -->
+    <div class="dashboard">
+
+        <!-- ── Video Feed ── -->
+        <div class="card video-card">
+            <div class="card__header">
+                <span class="card__title"><span class="card__title-icon">📹</span> Live Feed</span>
+                <span style="font-size:.72rem;color:var(--text-muted)">MJPEG Stream</span>
+            </div>
+            <div class="video-wrapper">
+                <img id="video-feed" src="/video_feed" alt="Live intersection feed">
+                <div class="video-overlay">
+                    <span class="video-overlay__badge video-overlay__badge--live">● LIVE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Stat Tiles ── -->
+        <div class="stats-grid">
+            <div class="stat-tile stat-tile--total">
+                <span class="stat-tile__label">Total Vehicles</span>
+                <span class="stat-tile__value" id="stat-total">0</span>
+                <span class="stat-tile__delta">
+                    <span id="stat-active">0</span> active tracks
+                </span>
+            </div>
+            <div class="stat-tile stat-tile--straight">
+                <span class="stat-tile__label">Straight</span>
+                <span class="stat-tile__value" id="stat-straight">0</span>
+            </div>
+            <div class="stat-tile stat-tile--left">
+                <span class="stat-tile__label">Left Turn</span>
+                <span class="stat-tile__value" id="stat-left">0</span>
+            </div>
+            <div class="stat-tile stat-tile--right">
+                <span class="stat-tile__label">Right Turn</span>
+                <span class="stat-tile__value" id="stat-right">0</span>
+            </div>
+        </div>
+
+        <!-- ── Traffic Flow Chart ── -->
+        <div class="card chart-card">
+            <div class="card__header">
+                <span class="card__title"><span class="card__title-icon">📊</span> Traffic Flow</span>
+            </div>
+            <div class="card__body">
+                <div class="chart-container">
+                    <canvas id="flow-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ Side Panel ═══ -->
+        <div class="side-panel">
+
+            <!-- Distribution Donut -->
+            <div class="card">
+                <div class="card__header">
+                    <span class="card__title"><span class="card__title-icon">🍩</span> Distribution</span>
+                </div>
+                <div class="card__body">
+                    <div class="donut-wrapper">
+                        <div class="donut-chart">
+                            <canvas id="donut-chart"></canvas>
+                        </div>
+                        <div class="donut-legend">
+                            <div class="donut-legend-item">
+                                <span class="donut-legend-dot" style="background:#10b981"></span>
+                                <span class="donut-legend-label">Straight</span>
+                                <span class="donut-legend-value" id="legend-straight">0</span>
+                            </div>
+                            <div class="donut-legend-item">
+                                <span class="donut-legend-dot" style="background:#f59e0b"></span>
+                                <span class="donut-legend-label">Left Turn</span>
+                                <span class="donut-legend-value" id="legend-left">0</span>
+                            </div>
+                            <div class="donut-legend-item">
+                                <span class="donut-legend-dot" style="background:#8b5cf6"></span>
+                                <span class="donut-legend-label">Right Turn</span>
+                                <span class="donut-legend-value" id="legend-right">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signal Phase -->
+            <div class="card">
+                <div class="card__header">
+                    <span class="card__title"><span class="card__title-icon">🚥</span> Signal Phase</span>
+                </div>
+                <div class="card__body">
+                    <div class="phase-list" id="phase-list">
+                        <div class="no-data">
+                            <span class="no-data__icon">🚥</span>
+                            <span class="no-data__text">Waiting for data…</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehicle Classes -->
+            <div class="card">
+                <div class="card__header">
+                    <span class="card__title"><span class="card__title-icon">🚗</span> Vehicle Classes</span>
+                </div>
+                <div class="card__body">
+                    <div class="class-breakdown" id="class-breakdown">
+                        <div class="no-data">
+                            <span class="no-data__icon">🚙</span>
+                            <span class="no-data__text">No detections yet</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Log -->
+            <div class="card">
+                <div class="card__header">
+                    <span class="card__title"><span class="card__title-icon">📋</span> Event Log</span>
+                </div>
+                <div class="card__body">
+                    <div class="event-log" id="event-log">
+                        <div class="no-data">
+                            <span class="no-data__icon">📋</span>
+                            <span class="no-data__text">No events yet</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/dashboard.js"></script>
+</body>
+</html>

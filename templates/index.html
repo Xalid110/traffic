@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Monitor — Live Map Control</title>
+    <meta name="description" content="Interactive map to control traffic monitoring cameras in real-time">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header" id="app-header">
+        <div class="header-left">
+            <div class="logo-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/>
+                </svg>
+            </div>
+            <div>
+                <h1>Traffic Monitor</h1>
+                <p class="header-subtitle">Live Camera Control Panel</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-indicator" id="connection-status">
+                <span class="status-dot online"></span>
+                <span class="status-text">System Online</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Map Container -->
+        <div class="map-wrapper" id="map-wrapper">
+            <div id="map"></div>
+            <div class="map-overlay-gradient"></div>
+        </div>
+
+        <!-- Side Panel -->
+        <aside class="side-panel" id="side-panel">
+            <div class="panel-header">
+                <h2>Camera Controls</h2>
+                <p class="panel-subtitle">Click a marker on the map or use buttons below</p>
+            </div>
+
+            <div class="monitors-list" id="monitors-list">
+                <!-- Populated dynamically -->
+            </div>
+
+            <!-- Info Card -->
+            <div class="info-card" id="info-card">
+                <div class="info-card-header">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                    <span>Quick Guide</span>
+                </div>
+                <ul class="info-list">
+                    <li>Click map markers to toggle cameras</li>
+                    <li>Green marker = camera running</li>
+                    <li>Each camera opens its own dashboard</li>
+                    <li>Only one instance per camera allowed</li>
+                </ul>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
